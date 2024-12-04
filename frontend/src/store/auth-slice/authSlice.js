@@ -144,7 +144,7 @@ export const fetchCurrentUser = createAsyncThunk(
       // Update Redux state
       dispatch(authSlice.actions.setAuth({ user: response.data, role: response.data.role, isAuthenticated: true }));
 
-      return { user, role }; // Ensure you return these details
+      return { user: response.data, role: response.data.role }; // Ensure you return these details
     } catch (error) {
       // If fetching the user fails, set authenticated to false
       dispatch(authSlice.actions.setAuth({ user: null, role: null, isAuthenticated: false }));
@@ -159,16 +159,30 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    // setAuth: (state, action) => {
+    //   const { access, refresh, role, user } = action.payload;
+    //   console.log("Setting Auth:", action.payload);  // Add this log
+    //   state.access = access;
+    //   state.refresh = refresh;
+    //   state.role = role;
+    //   state.user = user;
+    //   state.isAuthenticated = true;
+    // },
     setAuth: (state, action) => {
-      const { access, refresh, role, user } = action.payload;
-      console.log("Setting Auth:", action.payload);  // Add this log
-      state.access = access;
-      state.refresh = refresh;
-      state.role = role;
-      state.user = user;
-      state.isAuthenticated = true;
+      console.log("Setting Auth:", action.payload); // Debug log
+      const { access, refresh, role, user } = action.payload || {};
+      state.access = access || null;
+      state.refresh = refresh || null;
+      state.role = role || null;
+      state.user = user || null;
+      state.isAuthenticated = !!user; // Set based on user presence
     },
-
+    // loginSuccess(state, action) {
+    //   state.user = action.payload.user;
+    //   state.isAuthenticated = true;
+    //   state.role = action.payload.role;
+    //   state.token = action.payload.token;
+    // },
     logout: (state) => {
       state.access = null;
       state.refresh = null;
@@ -197,21 +211,34 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isAuthenticated = true;
-        state.accessToken = action.payload.access;
-        state.refreshToken = action.payload.refresh;
-        state.user = action.payload.user; // Store user details
-        state.role = action.payload.role; // Store user role
-      })
+      // .addCase(loginUser.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isAuthenticated = true;
+      //   state.accessToken = action.payload.access;
+      //   state.refreshToken = action.payload.refresh;
+      //   state.user = action.payload.user; // Store user details
+      //   state.role = action.payload.role; // Store user role
+      // })
+
       // .addCase(loginUser.fulfilled, (state, action) => {
       //   state.access = action.payload.access;
       //   state.refresh = action.payload.refresh;
-      //   state.user = { ...state.user, role: action.payload.role };
+      //   // state.user = { ...state.user, role: action.payload.role };
+      //   state.user = action.payload.user; // Correctly set user
+      //   state.role = action.payload.role;
       //   state.isAuthenticated = true;
       //   state.isLoading = false;
       // })
+
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.access = action.payload.access;
+        state.refresh = action.payload.refresh;
+        state.user = action.payload.user || state.user; // Preserve existing user if not provided
+        state.role = action.payload.role || state.role; // Preserve role
+        state.isAuthenticated = true;
+        state.isLoading = false;
+      })
+
 
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -231,10 +258,18 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
-        state.role = action.payload?.role;  // Store role in the state
+        state.user = action.payload.user;
+        state.role = action.payload.role;  // Store role in the state
         state.isAuthenticated = true;
       })
+      // .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   const { user, role } = action.payload || {};
+      //   state.user = user || state.user; // Preserve existing user if undefined
+      //   state.role = role || state.role;
+      //   state.isAuthenticated = !!user;
+      // })
+
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.isLoading = false;
         state.user = null;
@@ -242,5 +277,7 @@ const authSlice = createSlice({
       });
   },
 });
+
+export const { setAuth, logout } = authSlice.actions;
 
 export default authSlice.reducer;
