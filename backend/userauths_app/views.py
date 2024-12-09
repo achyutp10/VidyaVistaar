@@ -9,12 +9,30 @@ from teacher_app.models import Teacher
 from userauths_app.serializers import UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer, TeacherSerializer
 from django.db import transaction
 import logging
+from django.contrib.auth import authenticate
+
 
 logger = logging.getLogger(__name__)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(username=email, password = password)
+        
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            user_serializer = UserSerializer(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user' : user_serializer.data
+            })
+        else:
+            return Response({'detail':'Invalid credentials'}, status=401)
 
 # class MyTokenObtainPairView(TokenObtainPairView):
 #     serializer_class = MyTokenObtainPairSerializer
@@ -121,6 +139,8 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = MyTokenObtainPairSerializer
+    
+    
 
 from django.views.decorators.csrf import csrf_exempt
 

@@ -234,7 +234,8 @@ const authSlice = createSlice({
         state.access = action.payload.access;
         state.refresh = action.payload.refresh;
         state.user = action.payload.user || state.user; // Preserve existing user if not provided
-        state.role = action.payload.role || state.role; // Preserve role
+        // state.role = action.payload.role || state.role; // Preserve role
+        state.role = action.payload.user.role || state.role; // Preserve role
         state.isAuthenticated = true;
         state.isLoading = false;
       })
@@ -259,7 +260,8 @@ const authSlice = createSlice({
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.role = action.payload.role;  // Store role in the state
+        // state.role = action.payload.role;  // Store role in the state
+        state.role = action.payload.user.role;  // Store role in the state
         state.isAuthenticated = true;
       })
       // .addCase(fetchCurrentUser.fulfilled, (state, action) => {
