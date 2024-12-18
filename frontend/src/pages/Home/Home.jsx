@@ -6,9 +6,7 @@ import Body from '../../components/Body'
 function Home() {
   return (
     <div className=''>
-      <Navbar />
       <Body />
-      <Footer />
     </div>
   )
 }

@@ -90,7 +90,6 @@ const Register = () => {
 
   return (
     <>
-      <Navbar />
       <div className="max-w-sm bg-white mx-auto p-3 mt-4 border-2 rounded">
         <h2 className="text-2xl font-semibold pt-3 text-center">
           Please Register

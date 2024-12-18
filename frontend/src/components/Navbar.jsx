@@ -50,7 +50,7 @@ function Navbar() {
   return (
     <Container>
       {/* // <header className='bg-white py-6 border'> */}
-      <nav className='container mx-auto flex justify-between px-5'>
+      <nav className='container mx-15 flex justify-between'>
         <a href="/">
           <img src="/logo.png" alt="logo" className='h-12' />
         </a>

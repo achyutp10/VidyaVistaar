@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -303,9 +304,12 @@ CORS_ALLOW_HEADERS = [
 
 # Email Configuration
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'django.fixit@gmail.com'
-EMAIL_HOST_PASSWORD = 'rerpqmymvrdsctpi'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'VidyaVistar <django.fixit@gmail.com>'
+# SECRET_KEY = config('SECRET_KEY')
+
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+

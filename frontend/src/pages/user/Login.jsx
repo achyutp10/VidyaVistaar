@@ -26,27 +26,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Login the user
       const loginResponse = await dispatch(loginUser(formData)).unwrap();
 
       if (loginResponse && loginResponse.user.role) {
-        // Get the role from the login response
         const userRole = loginResponse.user.role;
 
-        // console.log("User role for navigation:", userRole);
-
-        // Navigate based on role
         if (userRole === 'STUDENT') {
           navigate('/student-dashboard');
           Toast().fire({
             icon: "success",
-            title: "Login Successfull!",
+            title: "Login Successful!",
           });
         } else if (userRole === 'TEACHER') {
           navigate('/teacher-dashboard');
           Toast().fire({
             icon: "success",
-            title: "Login Successfull!",
+            title: "Login Successful!",
           });
         } else {
           Toast().fire({
@@ -57,14 +52,15 @@ const Login = () => {
       } else {
         throw new Error("Login response did not contain valid data");
       }
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (err) {
+      console.error('Login failed:', err);
       Toast().fire({
         icon: "error",
-        title: "Login failed",
+        title: err?.detail || "Login failed",
       });
     }
   };
+
 
 
 
@@ -82,7 +78,6 @@ const Login = () => {
 
   return (
     <>
-      <Navbar />
       <div className="max-w-sm bg-white mx-auto p-2 mt-6 border-2 rounded-lg">
         <h2 className="text-2xl font-semibold pt-3 text-center">Please login</h2>
         <form className="space-y-5 max-w-sm mx-auto pt-8" onSubmit={handleSubmit}>
@@ -104,7 +99,7 @@ const Login = () => {
             placeholder="Password"
             required
           />
-          {error && <p className="text-red-500">{error}</p>} {/* Display error */}
+          {error && <p className="text-red-500">{typeof error === 'object' ? error.detail || JSON.stringify(error) : error}</p>} {/* Display error */}
           <button
             type="submit"
             className="w-full mt-5 bg-indigo-500 text-white font-medium py-3 rounded-md"

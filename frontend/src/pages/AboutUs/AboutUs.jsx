@@ -1,11 +1,8 @@
 import React from 'react';
-import Navbar from '../../components/Navbar';
-import Container from '../../components/Container';
 
 function AboutUs() {
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Navbar />
       {/* Header */}
       <header className="bg-blue-600 text-white text-center py-16">
         <h1 className="text-4xl font-bold">About Us</h1>
