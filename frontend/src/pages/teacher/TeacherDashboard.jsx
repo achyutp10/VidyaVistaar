@@ -8,7 +8,7 @@ function TeacherDashboard() {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       TeacherDashboard
       <p>{user?.first_name}</p>
       <p>{user?.last_name}</p>

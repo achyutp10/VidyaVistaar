@@ -3,6 +3,7 @@ import { fetchCurrentUser, logoutUser } from '../store/auth-slice/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Toast from '../utils/Toast';
+import Container from './Container';
 
 
 const navLists = [
@@ -16,7 +17,6 @@ function Navbar() {
   const navigate = useNavigate();
 
   const { user } = useSelector((state) => state.auth);
-  console.log(user)
 
   // if (!user) {
   //   console.log("User data is not yet available.");
@@ -33,14 +33,23 @@ function Navbar() {
       icon: "success",
       title: "Logout Successfull!",
     });
-    // localStorage.removeItem('access_token'); // Clear token from localStorage
-    // localStorage.removeItem('refresh_token'); // Clear token from localStorage
   };
+
+  const handleDashboard = (e) => {
+    e.preventDefault()
+    if (user.role === 'STUDENT') {
+      navigate('/student-dashboard');
+    } else if (user.role === 'TEACHER') {
+      navigate('/teacher-dashboard');
+    };
+  }
+
   useEffect(() => {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
   return (
-    <header className='bg-white py-6 border'>
+    <Container>
+      {/* // <header className='bg-white py-6 border'> */}
       <nav className='container mx-auto flex justify-between px-5'>
         <a href="/">
           <img src="/logo.png" alt="logo" className='h-12' />
@@ -63,15 +72,19 @@ function Navbar() {
 
           {/* Conditional rendering based on user presence */}
           {user ? (
-            <li>
+            <li className='flex gap-2'>
               <button
                 onClick={handleLogout}
                 className='bg-[#1E73BE] px-4 py-1.5 text-white rounded-sm'
               >
                 Logout
               </button>
-
-
+              <button
+                onClick={handleDashboard}
+                className='bg-[#1E73BE] px-4 py-1.5 text-white rounded-sm'
+              >
+                Dashboard
+              </button>
             </li>
           ) : (
             <li>
@@ -87,7 +100,8 @@ function Navbar() {
 
       </nav>
 
-    </header>
+      {/* // </header> */}
+    </Container>
   )
 }
 

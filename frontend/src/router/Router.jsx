@@ -7,6 +7,8 @@ import Register from '../pages/user/Register';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import TeacherDashboard from '../pages/teacher/TeacherDashboard';
 import ProtectedRoute from './ProtectedRoute';
+import ForgetPassword from '../pages/user/ForgetPassword';
+import ResetPassword from '../pages/user/ResetPassword';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,19 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />
       },
+      {
+        path: "/forget-password",
+        element: <ForgetPassword />
+      },
+      // {
+      //   path: "/reset_password_validate/:uid/:token",
+      //   element: <ResetPassword />
+      // },
+      {
+        path: "/reset_password_validate/:uid/:token",
+        element: <ResetPassword />
+      },
+
       {
         path: "/register",
         element: <Register />

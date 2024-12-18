@@ -12,6 +12,9 @@ const initialState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  resetStatus: null, // null, "loading", "success", or "error"
+  resetMessage: "",
+  resetError: "",
 };
 
 // Register User
@@ -47,7 +50,9 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await axiosInstance.post('/user/login/', formData);
 
-      const { access, refresh, role, user } = response.data;
+      // const { access, refresh, role, user } = response.data;
+      const { access, refresh, user } = response.data;
+      const { role } = user;
       // console.log("Login Response:", response.data);
       // console.log("User after login:", user);
 
@@ -153,6 +158,47 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
+export const sendForgotPasswordEmail = createAsyncThunk(
+  "auth/sendForgotPasswordEmail",
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        "http://127.0.0.1:8000/api/v1/forgot_password/",
+        { email }
+      );
+      return response.data; // Return the response message or data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "An error occurred. Please try again."
+      );
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ uid, token, password, confirmPassword }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        "http://127.0.0.1:8000/api/v1/reset_password/",
+        {
+          uid,
+          token,
+          password,
+          confirm_password: confirmPassword,
+        }
+      );
+      return response.data.message; // Assuming the API response contains a success message
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error ||
+        "Something went wrong. Please try again later."
+      );
+    }
+  }
+);
+
+
 
 
 const authSlice = createSlice({
@@ -169,13 +215,14 @@ const authSlice = createSlice({
     //   state.isAuthenticated = true;
     // },
     setAuth: (state, action) => {
-      console.log("Setting Auth:", action.payload); // Debug log
+      // console.log("Setting Auth:", action.payload); // Debug log
       const { access, refresh, role, user } = action.payload || {};
       state.access = access || null;
       state.refresh = refresh || null;
       state.role = role || null;
       state.user = user || null;
       state.isAuthenticated = !!user; // Set based on user presence
+
     },
     // loginSuccess(state, action) {
     //   state.user = action.payload.user;
@@ -189,6 +236,15 @@ const authSlice = createSlice({
       state.role = null;
       state.user = null;
       state.isAuthenticated = false;
+    },
+    clearMessage: (state) => {
+      state.message = "";
+      state.error = "";
+    },
+    clearResetState: (state) => {
+      state.resetStatus = null;
+      state.resetMessage = "";
+      state.resetError = "";
     },
   },
   extraReducers: (builder) => {
@@ -276,10 +332,37 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+      })
+
+      .addCase(sendForgotPasswordEmail.pending, (state) => {
+        state.emailStatus = "loading";
+        state.message = "";
+        state.error = "";
+      })
+      .addCase(sendForgotPasswordEmail.fulfilled, (state, action) => {
+        state.emailStatus = "success";
+        state.message = action.payload; // Assuming the API response has a success message
+      })
+      .addCase(sendForgotPasswordEmail.rejected, (state, action) => {
+        state.emailStatus = "error";
+        state.error = action.payload;
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.resetStatus = "loading";
+        state.resetMessage = "";
+        state.resetError = "";
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.resetStatus = "success";
+        state.resetMessage = action.payload;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.resetStatus = "error";
+        state.resetError = action.payload;
       });
   },
 });
 
-export const { setAuth, logout } = authSlice.actions;
+export const { setAuth, logout, clearMessage, clearResetState } = authSlice.actions;
 
 export default authSlice.reducer;

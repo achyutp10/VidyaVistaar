@@ -6,8 +6,9 @@ function StudentDashboard() {
   const { user } = useSelector((state) => state.auth);
 
   return (
+
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <h1>Student Dashboard</h1>
       <p>{user?.first_name}</p>
       <p>{user?.last_name}</p>

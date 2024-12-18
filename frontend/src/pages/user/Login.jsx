@@ -29,9 +29,9 @@ const Login = () => {
       // Login the user
       const loginResponse = await dispatch(loginUser(formData)).unwrap();
 
-      if (loginResponse && loginResponse.role) {
+      if (loginResponse && loginResponse.user.role) {
         // Get the role from the login response
-        const userRole = loginResponse.role;
+        const userRole = loginResponse.user.role;
 
         // console.log("User role for navigation:", userRole);
 
@@ -120,6 +120,13 @@ const Login = () => {
             Register{' '}
           </Link>{' '}
           here.
+        </p>
+        <p className="my-5 text-center">
+          <Link to="/forget-password" className="text-red-700 italic">
+            {' '}
+            Forget Password?{' '}
+          </Link>{' '}
+
         </p>
       </div>
     </>

@@ -279,6 +279,8 @@ SWAGGER_SETTINGS = {
     },
 }
 
+FRONTEND_URL = "http://localhost:5173"
+
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
@@ -298,3 +300,12 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Email Configuration
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'django.fixit@gmail.com'
+EMAIL_HOST_PASSWORD = 'rerpqmymvrdsctpi'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'VidyaVistar <django.fixit@gmail.com>'
