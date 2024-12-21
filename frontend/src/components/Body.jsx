@@ -4,7 +4,7 @@ function Body() {
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-blue-600 text-white text-center py-16">
+      <header className="bg-[#e7f5ef] text-black text-center py-16">
         <h1 className="text-4xl font-bold">Welcome to My Website</h1>
         <p className="mt-4 text-xl">Your go-to platform for learning and growth.</p>
       </header>

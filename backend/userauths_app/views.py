@@ -26,10 +26,16 @@ class MyTokenObtainPairView(TokenObtainPairView):
         if user is not None:
             refresh = RefreshToken.for_user(user)
             user_serializer = UserSerializer(user)
+
+            user_data = user_serializer.data
+            if hasattr(user, 'userprofile'):
+                user_data['profile_picture'] = user.userprofile.profile_picture.url if user.userprofile.profile_picture else None
+
+
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'user' : user_serializer.data
+                'user' : user_data
             })
         else:
             return Response({'detail':'Invalid credentials'}, status=401)
@@ -172,6 +178,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import EmailMessage
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
@@ -188,12 +195,43 @@ class ForgotPasswordView(APIView):
             # reset_link = f"{request.build_absolute_uri('/reset_password_validate/')}{uid}/{token}/"
             reset_link = f"{settings.FRONTEND_URL}/reset_password_validate/{uid}/{token}/"
 
+             # Send the email
+            # mail_subject = 'Reset your password'
+            # message = f"Hi, {user.username},/n
+            #                  Click the link below to reset your password: /n
+            #                     {reset_link}"
+            # send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
             
             # Send the email
             mail_subject = 'Reset your password'
-            message = f"Click the link below to reset your password:\n{reset_link}"
-            send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+            message = f"""
+            <html>
+                <body>
+                    <p>Hi, {user.username},</p>
+                    <p>Click the button below to reset your password:</p>
+                    <a href="{reset_link}" 
+                    style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; 
+                            background-color: #007BFF; text-decoration: none; border-radius: 5px;">
+                    Reset Password
+                    </a>
+                </body>
+            </html>
+            """
+
+            # Create the email
+            email = EmailMessage(
+                subject=mail_subject,
+                body=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email],
+            )
+
+            # Set the content type to HTML
+            email.content_subtype = "html"
+
+            # Send the email
+            email.send()
 
             return Response({"message": "Password reset link has been sent to your email."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

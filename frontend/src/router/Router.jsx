@@ -9,6 +9,8 @@ import TeacherDashboard from '../pages/teacher/TeacherDashboard';
 import ProtectedRoute from './ProtectedRoute';
 import ForgetPassword from '../pages/user/ForgetPassword';
 import ResetPassword from '../pages/user/ResetPassword';
+import Notes from '../pages/Notes/Notes';
+import MyNotes from '../pages/student/MyNotes';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +61,14 @@ const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={['TEACHER']}>
             <TeacherDashboard />
           </ProtectedRoute>
+        )
+      },
+      {
+        path: "/notes",
+        element: (
+
+          <MyNotes />
+
         )
       },
     ]

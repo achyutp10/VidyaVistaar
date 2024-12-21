@@ -163,7 +163,7 @@ export const sendForgotPasswordEmail = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "http://127.0.0.1:8000/api/v1/forgot_password/",
+        "/forgot_password/",
         { email }
       );
       return response.data; // Return the response message or data
@@ -180,7 +180,7 @@ export const resetPassword = createAsyncThunk(
   async ({ uid, token, password, confirmPassword }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "http://127.0.0.1:8000/api/v1/reset_password/",
+        "/reset_password/",
         {
           uid,
           token,
@@ -188,7 +188,7 @@ export const resetPassword = createAsyncThunk(
           confirm_password: confirmPassword,
         }
       );
-      return response.data.message; // Assuming the API response contains a success message
+      return response.data.message;                                  // Assuming the API response contains a success message
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.error ||

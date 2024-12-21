@@ -51,11 +51,17 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
     role = serializers.CharField(write_only=True, required=True)
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'role', 'password', 'password2']
+        fields = ['first_name', 'last_name', 'username', 'email', 'phone_number', 'role', 'profile_picture', 'password', 'password2']
         extra_kwargs = {'password': {'write_only': True}}
+    
+    def get_profile_picture(self, obj):
+        if hasattr(obj, 'userprofile') and obj.userprofile.profile_picture:
+            return obj.userprofile.profile_picture.url
+        return None
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:

@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.active{
+  color: #14c798;
+}
+
+.body {
+  font-family: "Poppins", serif;
+  font-weight: 700;
+  font-style: normal;
+}

@@ -1,12 +1,10 @@
 import React from 'react'
-import Navbar from '../../components/Navbar'
 import { useSelector } from 'react-redux';
 import Sidebar from '../../components/Sidebar';
-import Stats from '../Notes/Stats';
 import Notes from '../Notes/Notes';
 
 
-function StudentDashboard() {
+function MyNotes() {
   const { user } = useSelector((state) => state.auth);
 
   return (
@@ -23,8 +21,7 @@ function StudentDashboard() {
                 {" "}
                 <i className="bi bi-grid-fill"></i> Welcome, {user?.first_name} {user?.last_name}
               </h4>
-              <Stats />
-
+              <Notes />
             </div>
           </div>
         </div>
@@ -44,4 +41,4 @@ function StudentDashboard() {
   )
 }
 
-export default StudentDashboard
+export default MyNotes

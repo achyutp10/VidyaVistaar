@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { sendForgotPasswordEmail, clearMessage } from '../../store/auth-slice/authSlice';
-import Toast from '../../utils/Toast';
+import { sendForgotPasswordEmail, clearMessage } from "../../store/auth-slice/authSlice";
+import Toast from "../../utils/Toast";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -28,52 +28,51 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="main-section">
-      <div className="user-dashboard">
-        <div className="user-holder">
-          <h4 className="text-center mb-0">Forgot Your Password?</h4>
-          <p className="text-center">
-            Please enter your email and we will send you a link to reset your
-            password.
-          </p>
-          <hr />
-          <div id="restaurant-sets-holder">
-            <form
-              className="form-fields-set"
-              onSubmit={handleSubmit}
-              encType="multipart/form-data"
-            >
-              <div className="field-holder">
-                <label>Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  className="form-control px-2"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="field-holder payment-holder">
-                <input
-                  type="submit"
-                  value={
-                    emailStatus === "loading" ? "Sending..." : "Submit"
-                  }
-                  className="btn btn-danger mb-2"
-                  disabled={emailStatus === "loading"}
-                />
-              </div>
-            </form>
-            {emailStatus === "success" && (
-              <p className="text-success text-center mt-3">{message.text}</p>
-            )}
-            {emailStatus === "error" && (
-              <p className="text-danger text-center mt-3">{error.text}</p>
-            )}
+    <div className="flex justify-center items-center min-h-screen bg-white">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h4 className="text-2xl font-semibold text-center mb-4 text-gray-800">
+          Forgot Your Password?
+        </h4>
+        <p className="text-sm text-gray-600 text-center mb-6">
+          Please enter your email address, and we will send you a link to reset your password.
+        </p>
+        <hr className="mb-6" />
+        <form
+          className="space-y-4"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+        >
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+          <button
+            type="submit"
+            className={`w-full px-4 py-2 rounded-md text-white font-semibold ${emailStatus === "loading"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+              }`}
+            disabled={emailStatus === "loading"}
+          >
+            {emailStatus === "loading" ? "Sending..." : "Submit"}
+          </button>
+        </form>
+        {emailStatus === "success" && (
+          <p className="mt-4 text-green-600 text-center">{message?.text}</p>
+        )}
+        {emailStatus === "error" && (
+          <p className="mt-4 text-red-600 text-center">{error?.text}</p>
+        )}
       </div>
     </div>
   );
