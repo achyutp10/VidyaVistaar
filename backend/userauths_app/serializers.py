@@ -155,3 +155,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
+    
+
+class ActivationSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField()
+    token = serializers.CharField()

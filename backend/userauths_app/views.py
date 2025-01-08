@@ -6,10 +6,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from userauths_app.models import User, UserProfile, Role
 from teacher_app.models import Teacher
-from userauths_app.serializers import ForgotPasswordSerializer, ResetPasswordSerializer, UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer, TeacherSerializer
+from userauths_app.serializers import ActivationSerializer, ForgotPasswordSerializer, ResetPasswordSerializer, UserSerializer, UserProfileSerializer, MyTokenObtainPairSerializer, TeacherSerializer
 from django.db import transaction
 import logging
 from django.contrib.auth import authenticate
+from .utils import send_verification_email
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 
 logger = logging.getLogger(__name__)
@@ -39,46 +42,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
             })
         else:
             return Response({'detail':'Invalid credentials'}, status=401)
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
-
-    
-
-#     def post(self, request, *args, **kwargs):
-#         # Get the response from the TokenObtainPairView
-#         response = super().post(request, *args, **kwargs)
-
-#         # Debugging: Check if user is authenticated
-#         print(f"User: {request.user}, Authenticated: {request.user.is_authenticated}")
-
-#         if request.user.is_authenticated:
-#             response_data = response.data
-#             print(f"User: {request.user}, Authenticated: {request.user.is_authenticated}")
-            
-#             # Fetch the role using the get_role method
-#             role = request.user.get_role()
-
-#             # Debugging: Print role or 'No Role Assigned'
-#             if role:
-#                 print(f"User role: {role}")
-#             else:
-#                 print("No Role Assigned")
-
-#             # Add the role to the response data
-#             response_data['role'] = role if role else "No Role Assigned"
-
-#             # Debugging: Log the updated response data
-#             print(f"Updated Response Data: {response_data}")
-
-#             return Response(response_data)
-
-#         # If not authenticated, log it
-#         print("User is not authenticated")
-#         return response
-
-
-
 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -128,6 +91,11 @@ class RegisterUserView(generics.CreateAPIView):
                 is_approved=False,
                 is_available_status=False,
             )
+        
+        #Send verification email
+        mail_subject = 'Please activate your account'
+        email_template = 'email/account_verification_email.html'
+        send_verification_email(request, user, mail_subject, email_template)
 
         headers = self.get_success_headers(serializer.data)
         logger.info(f"Sending response: {serializer.data}")
@@ -155,16 +123,26 @@ class LogoutView(APIView):
 
     def post(self, request):
         refresh_token = request.data.get("refresh")
-        
+        access_token = request.data.get("access")
+
         if not refresh_token:
             return Response({"error": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            # if access_token:
+            #     # Verify and delete the access token
+            #     token = AccessToken(access_token)
+            #     token.blacklist()  # Requires Blacklist app for JWT
+            
+            # Blacklist the refresh token
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
+
+            return Response({"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CurrentUserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
@@ -190,18 +168,7 @@ class ForgotPasswordView(APIView):
             # Generate token and send email
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(str(user.pk).encode())
-            # reset_link = f"{request.build_absolute_uri('/')}reset_password_validate/{uid}/{token}/"
-            # reset_link = f"{request.build_absolute_uri('/api/v1/reset_password_validate/{uid}/{token}/')}"
-            # reset_link = f"{request.build_absolute_uri('/reset_password_validate/')}{uid}/{token}/"
             reset_link = f"{settings.FRONTEND_URL}/reset_password_validate/{uid}/{token}/"
-
-             # Send the email
-            # mail_subject = 'Reset your password'
-            # message = f"Hi, {user.username},/n
-            #                  Click the link below to reset your password: /n
-            #                     {reset_link}"
-            # send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [email])
-
             
             # Send the email
             mail_subject = 'Reset your password'
@@ -253,25 +220,6 @@ class ResetPasswordValidateView(APIView):
             return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class ResetPasswordView(APIView):
-#     permission_classes = [AllowAny]
-#     def post(self, request):
-#         serializer = ResetPasswordSerializer(data=request.data)
-#         if serializer.is_valid():
-#             uid = request.session.get('uid')
-#             if not uid:
-#                 return Response({"error": "Session expired. Please initiate the process again."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             try:
-#                 user = User.objects.get(pk=uid)
-#             except User.DoesNotExist:
-#                 return Response({"error": "Invalid session."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             user.set_password(serializer.validated_data['password'])
-#             user.is_active = True
-#             user.save()
-#             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
@@ -300,3 +248,120 @@ class ResetPasswordView(APIView):
             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+
+class ActivateUserView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, uidb64, token, *args, **kwargs):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return HttpResponseRedirect('http://localhost:5173/login')
+            # Return a response with a redirect URL
+            # return Response({
+            #     "message": "Account activated successfully.",
+            #     "redirect_url": "http://localhost:5173/login"
+            # }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+
+# def activate(request, uidb64, token):
+#   # Activate user by setting the is_active status to True
+#   try:
+#       uid = urlsafe_base64_decode(uidb64).decode()
+#       user = User._default_manager.get(pk=uid)
+#   except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+#      user = None
+
+#   if user is not None and default_token_generator.check_token(user, token):
+#      user.is_active = True
+#      user.save()
+#      return Response({"message": "Account activated successfully."}, status=status.HTTP_200_OK)
+#   else:
+#      return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
+from . import utils
+from rest_framework.response import Response
+from rest_framework import status
+from .models import User, Role, UserProfile
+import logging
+
+logger = logging.getLogger(__name__)
+
+def authenticate_or_create_user(email):
+    try:
+        user = User.objects.get(email=email)
+        logger.info(f"User {email} exists.")
+    except User.DoesNotExist:
+        # Assign default role as 'STUDENT'
+        try:
+            role, created = Role.objects.get_or_create(name='STUDENT')
+        except Exception as e:
+            logger.error(f"Error fetching/creating role 'STUDENT': {e}")
+            return None
+
+        user = User.objects.create_user(
+            first_name=email.split("@")[0],
+            last_name='',
+            username=email.split("@")[0],
+            email=email,
+            phone_number='',
+        )
+        user.role = role
+        user.is_active = True  # Assuming you want to activate the user upon Google login
+        user.save()
+        logger.info(f"Created new user {email} with role 'STUDENT'.")
+
+    return user
+
+def get_jwt_token(user):
+    access_token = AccessToken.for_user(user)
+    refresh_token = RefreshToken.for_user(user)  # For refresh token
+    return {
+        "access_token": str(access_token),
+        "refresh_token": str(refresh_token),
+    }
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginWithGoogle(APIView):
+    permission_classes = [AllowAny]  # Allow unauthenticated access
+
+    def post(self, request):
+        if 'code' in request.data.keys():
+            code = request.data['code']
+            id_token = utils.get_id_token_with_code_method_1(code)
+            
+            if id_token is None:
+                return Response(
+                    {"error": "Invalid authorization code or missing id_token."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            user_email = id_token.get('email')
+            if not user_email:
+                return Response({"error": "Email not found in id_token."}, status=status.HTTP_400_BAD_REQUEST)
+
+            user = authenticate_or_create_user(user_email)
+            tokens = get_jwt_token(user)  # Updated to match the fixed get_jwt_token function
+            return Response({
+                'access_token': tokens['access_token'],
+                'refresh_token': tokens['refresh_token'],
+                'username': user_email,
+                'role': user.get_role(),
+            })
+        
+        return Response({"error": "Authorization code not provided."}, status=status.HTTP_400_BAD_REQUEST)

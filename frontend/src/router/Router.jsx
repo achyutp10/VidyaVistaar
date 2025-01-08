@@ -11,6 +11,7 @@ import ForgetPassword from '../pages/user/ForgetPassword';
 import ResetPassword from '../pages/user/ResetPassword';
 import Notes from '../pages/Notes/Notes';
 import MyNotes from '../pages/student/MyNotes';
+import ActivatePage from '../pages/UtilityPages/ActivatePage';
 
 const router = createBrowserRouter([
   {
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
         element: (
 
           <MyNotes />
+
+        )
+      },
+      {
+        path: "/activate/:uidb64/:token",
+        element: (
+
+          <ActivatePage />
 
         )
       },

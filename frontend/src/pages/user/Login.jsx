@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { fetchCurrentUser, loginUser } from '../../store/auth-slice/authSlice';
 import Toast from '../../utils/Toast';
+import GoogleLoginButton from '../../components/GoogleLoginButton';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -78,9 +79,9 @@ const Login = () => {
 
   return (
     <>
-      <div className="max-w-sm bg-white mx-auto p-2 mt-6 border-2 rounded-lg">
+      <div className="max-w-sm bg-white mx-auto p-3 mt-2 border-2 rounded-lg">
         <h2 className="text-2xl font-semibold pt-3 text-center">Please login</h2>
-        <form className="space-y-5 max-w-sm mx-auto pt-8" onSubmit={handleSubmit}>
+        <form className="space-y-3 max-w-sm mx-auto pt-8" onSubmit={handleSubmit}>
           <input
             type="text"
             name="email"
@@ -100,23 +101,26 @@ const Login = () => {
             required
           />
           {error && <p className="text-red-500">{typeof error === 'object' ? error.detail || JSON.stringify(error) : error}</p>} {/* Display error */}
-          <button
-            type="submit"
-            className="w-full mt-5 bg-indigo-500 text-white font-medium py-3 rounded-md"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
+          <div className="flex items-center justify-center">
+            <button
+              type="submit"
+              className="justify-between items-center w-full mt-1 bg-indigo-500 text-white font-medium text-xl tracking-widest py-3 rounded-md hover:bg-indigo-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'LOGIN'}
+            </button>
+          </div>
         </form>
-        <p className="my-5 text-center">
+        <p className="my-2 text-center">
           Don't have an account?
           <Link to="/register" className="text-red-700 italic">
             {' '}
             Register{' '}
           </Link>{' '}
           here.
+          <GoogleLoginButton />
         </p>
-        <p className="my-5 text-center">
+        <p className="my-3 text-center">
           <Link to="/forget-password" className="text-red-700 italic">
             {' '}
             Forget Password?{' '}

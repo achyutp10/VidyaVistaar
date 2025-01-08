@@ -104,15 +104,24 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
-      await axiosInstance.post('/logout/', { refresh: refreshToken });
+      const accessToken = localStorage.getItem('access_token');
+
+      if (!refreshToken) {
+        throw new Error("No refresh token found in local storage");
+      }
+
+      await axiosInstance.post('/logout/', { refresh: refreshToken, access: accessToken });
+
+      // Clear tokens
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
-      return {};
+      return {}; // Return empty state
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message || 'Logout failed');
     }
   }
 );
+
 
 // Get Current User
 // export const fetchCurrentUser = createAsyncThunk(

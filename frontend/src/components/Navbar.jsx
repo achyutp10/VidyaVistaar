@@ -11,8 +11,8 @@ import { RxDashboard } from "react-icons/rx";
 import { FaRegUser } from "react-icons/fa6";
 
 const navLists = [
-  { name: 'Home', path: '/' },
-  { name: 'About us', path: '/about-us' },
+  { name: 'HOME', path: '/' },
+  { name: 'ABOUT', path: '/about-us' },
 
 ];
 
@@ -34,14 +34,28 @@ function Navbar() {
   // console.log("Navbar user:", user);
   // console.log("Navbar role:", user.role);
 
-  const handleLogout = () => {
-    dispatch(logoutUser()); // Dispatch the logout action
-    navigate('/login');
-    Toast().fire({
-      icon: "success",
-      title: "Logout Successfull!",
-    });
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      const accessToken = localStorage.getItem('access_token');
+
+      console.log('Refresh Token:', refreshToken);
+      console.log('Access Token:', accessToken);
+
+      await dispatch(logoutUser()).unwrap(); // Wait for the action to complete
+      navigate('/login');
+      Toast().fire({
+        icon: 'success',
+        title: 'Logout Successful!',
+      });
+    } catch (error) {
+      Toast().fire({
+        icon: 'error',
+        title: 'Logout failed. Please try again.',
+      });
+    }
   };
+
 
   const handleDashboard = (e) => {
     e.preventDefault()
@@ -50,6 +64,10 @@ function Navbar() {
     } else if (user.role === 'TEACHER') {
       navigate('/teacher-dashboard');
     };
+  }
+
+  const handleRole = () => {
+
   }
 
   useEffect(() => {
@@ -64,7 +82,7 @@ function Navbar() {
   return (
     <Container>
       {/* // <header className='bg-white py-6 border'> */}
-      <nav className='flex justify-between h-50 p-1' style={{ backgroundColor: '#f4f4f4', }}>
+      <nav className='flex justify-between h-50 p-1' style={{ backgroundColor: '#f8ebee', }}>
         <a href="/">
           <img src="../../public/logo/logo.png" alt="logo" className='h-20 w-auto' />
         </a>
@@ -74,9 +92,9 @@ function Navbar() {
               <NavLink
                 to={list.path}
                 className={({ isActive }) =>
-                  `px-2 py-2 rounded-md transition-colors duration-500 ease-in-out ${isActive
-                    ? "bg-[#2a3521] text-[#a6ef67] font-semibold"
-                    : "text-gray-800 hover:bg-gray-100 hover:text-[#a6ef67]"
+                  `font-bold px-3 py-2 rounded-md transition-colors duration-500 ease-in-out ${isActive
+                    ? "text-[#fa010d] font-bold bg-inherit border-1 border-[#fa010d]"
+                    : "text-gray-800 hover:bg-[#fed8d9] border-top-1 hover:border-[1px] hover:border-[#fa010d] hover:text-[#fa010d]"
                   }`
                 }
               >
@@ -94,6 +112,12 @@ function Navbar() {
           {/* Conditional rendering based on user presence */}
           {user ? (
             <li className='flex gap-2'>
+              {
+                user?.role == 'STUDENT' ? (
+                  <button onClick={handleRole} className='font-bold bg-inherit border-1 border-[#fa010d] text-[#fa010d] px-2 py-1 rounded-xl flex justify-center items-center shadow-sm hover:text-[#fa010d] hover:bg-[#fed8d9]'>Become a Teacher</button>
+                ) : null
+              }
+
               <button onClick={handleLogout} className='text-[#000] hover:text-[#d16e60] hover:bg-[#000] p-2 h-auto w-14 rounded-full flex justify-center items-center shadow-lg'><BiLogOut size={28} /></button>
               <button
                 onClick={handleDashboard}
@@ -110,10 +134,7 @@ function Navbar() {
             </li>
           ) : (
             <li>
-              {/* <NavLink to="/login" className='bg-[#565564] px-5 py-3 text-white rounded-full hover:text-[#a6ef67]'>Login</NavLink> */}
-              <NavLink to="/login" className='bg-[#000] text-[#a6ef67] p-2 h-10 w-10 rounded-full flex justify-center items-center shadow-lg hover:text-[#d16e60] hover:bg-[#a6ef67]'><CgLogIn size={25} /></NavLink>
-
-
+              <NavLink to="/login" className='font-bold bg-inherit border-1 border-[#fa010d] text-[#fa010d] px-3 py-2 rounded flex justify-center items-center shadow-sm hover:text-[#fa010d] hover:bg-[#fed8d9]'><CgLogIn className='mt-1 mx-2' size={25} />  LOGIN</NavLink>
 
             </li>
           )}

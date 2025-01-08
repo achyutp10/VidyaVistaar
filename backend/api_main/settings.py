@@ -248,7 +248,7 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=15),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
@@ -305,7 +305,7 @@ CORS_ALLOW_HEADERS = [
 
 # Email Configuration
 
-# SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT')
