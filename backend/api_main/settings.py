@@ -305,12 +305,22 @@ CORS_ALLOW_HEADERS = [
 
 # Email Configuration
 
-SECRET_KEY = config('SECRET_KEY')
+# SECRET_KEY = config('SECRET_KEY')
 
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+# EMAIL_HOST = config('EMAIL_HOST')
+# EMAIL_PORT = config('EMAIL_PORT')
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER='django.fixit@gmail.com'
+EMAIL_HOST_PASSWORD='ijbjcogcohfcrexh'
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL='VIDYAVISTAR <django.fixit@gmail.com>'
+
+
+client_id='24448671049-m8rpn9uh13jpreah92mhvd6q69kou69c.apps.googleusercontent.com'
+client_secret='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'
