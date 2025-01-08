@@ -313,14 +313,6 @@ CORS_ALLOW_HEADERS = [
 # EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 # EMAIL_USE_TLS = config('EMAIL_USE_TLS')
 # DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+# CLIENT_ID = config('CLIENT_ID')
+# CLIENT_SECRET = config('CLIENT_SECRET')
 
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER='django.fixit@gmail.com'
-EMAIL_HOST_PASSWORD='ijbjcogcohfcrexh'
-EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL='VIDYAVISTAR <django.fixit@gmail.com>'
-
-
-client_id='24448671049-m8rpn9uh13jpreah92mhvd6q69kou69c.apps.googleusercontent.com'
-client_secret='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'
