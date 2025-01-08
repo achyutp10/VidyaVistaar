@@ -40,8 +40,8 @@ def get_id_token_with_code_method_1(code):
     token_endpoint = "https://oauth2.googleapis.com/token"
     payload = {
         'code': code,
-        'client_id': '24448671049-m8rpn9uh13jpreah92mhvd6q69kou69c.apps.googleusercontent.com',
-        'client_secret': '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',
+        'client_id': '',
+        'client_secret': '',
         'redirect_uri': redirect_uri,
         'grant_type': 'authorization_code',
     }
@@ -69,8 +69,8 @@ def get_id_token_with_code_method_1(code):
 #     token_endpoint = "https://oauth2.googleapis.com/token"
 #     payload = {
 #         'code': code,
-#         'client_id': '24448671049-m8rpn9uh13jpreah92mhvd6q69kou69c.apps.googleusercontent.com',
-#         'client_secret': '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',
+#         'client_id': '',
+#         'client_secret': '',
 #         'redirect_uri': redirect_uri,
 #         'grant_type': 'authorization_code',
 #     }
